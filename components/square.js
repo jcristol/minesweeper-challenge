@@ -1,6 +1,7 @@
+import React from 'react';
 import { createComponent } from 'cf-style-container';
 
-const Square = createComponent(
+const PrimitiveSquare = createComponent(
   ({ disabled }) => ({
     width: 40,
     height: 40,
@@ -15,5 +16,15 @@ const Square = createComponent(
   'div',
   ['onClick', 'onContextMenu']
 );
+
+class Square extends React.Component {
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+    return <PrimitiveSquare>{this.props.children}</PrimitiveSquare>;
+  }
+}
 
 export default Square;

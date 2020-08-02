@@ -1,3 +1,4 @@
+import { generateMineSweeperBoard } from '../utils/minesweeper';
 import Layout from '../components/layout';
 
 // game components
@@ -9,11 +10,11 @@ import Flag from '../components/flag';
 const Index = () => (
   <Layout title={`Minesweeper (active)`}>
     <Desk boardSize={10}>
-      {[...Array(100).keys()].map(i => (
-        <Square key={i} disabled={i === 55 || i === 10}>
-          {i === 10 && <Mine />}
-          {i === 25 && <Flag />}
-          {i === 77 ? '4' : ''}
+      {generateMineSweeperBoard(10).map(cell => (
+        <Square key={cell.i} disabled={cell.i === 55 || cell.i === 10}>
+          {cell.isMined && <Mine />}
+          {/* {cell.isFlagged === 25 && <Flag />} */}
+          {cell.distance && `${cell.distance}`}
         </Square>
       ))}
     </Desk>
