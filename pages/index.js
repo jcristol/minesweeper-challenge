@@ -8,7 +8,9 @@ import Flag from '../components/flag';
 import Controls from '../components/controls';
 import {
   createMineSweeperState,
-  areAllMinesFlagged
+  areAllMinesFlagged,
+  isOpenCell,
+  getFrontierCells
 } from '../utils/minesweeper';
 
 class Index extends React.Component {
@@ -26,21 +28,33 @@ class Index extends React.Component {
   }
 
   updateGameSetting(settings) {
+    const difficultMap = {
+      easy: 0.1,
+      medium: 0.2,
+      hard: 0.3
+    };
+
     this.setState({
-      gameSettings: settings,
-      gameBoard: createMineSweeperState(settings.boardSize)
+      gameSettings: {
+        boardSize: this.state.gameSettings.boardSize,
+        ...settings
+      },
+      gameBoard: createMineSweeperState(
+        settings.boardSize || this.state.gameSettings.boardSize,
+        difficultMap[settings.difficulty]
+      )
     });
   }
 
   reveal(event, cell, withRecursion = true) {
-    // this if statement tries to mimic original minesweeper
-    // in original minesweeper mines searched in the open reveal more then one game tile
-    // in this version of the game open tiles that are reveal
-    // all neighbors and neighbors neighbors specified by a depth
-    // if (withRecursion && isOpenCell(cell, this.state.gameBoard)) {
-    //   const neighborHood = getFrontierCells(cell, this.state.gameBoard, 2);
-    //   neighborHood.forEach(n => this.reveal(event, n, false));
-    // }
+    if (
+      this.state.gameSettings.authenticMode &&
+      withRecursion &&
+      isOpenCell(cell, this.state.gameBoard)
+    ) {
+      const neighborHood = getFrontierCells(cell, this.state.gameBoard, 2);
+      neighborHood.forEach(n => this.reveal(event, n, false));
+    }
 
     // update the gameboard state for this cell
     cell.isRevealed = true;

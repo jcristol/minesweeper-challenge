@@ -37,6 +37,17 @@ class Controls extends React.Component {
   }
 
   formSubmit() {
+    // in case you leave the form blank
+    if (this.state.boardSize === '') {
+      const { difficulty, authenticMode } = this.state;
+      const formSubmission = {
+        difficulty,
+        authenticMode
+      };
+      const { submitForm } = this.props;
+      submitForm(formSubmission);
+    }
+    // validating numeric input for the board size
     if (validBoardSizeInput(this.state.boardSize)) {
       const { difficulty, authenticMode, boardSize } = this.state;
       const formSubmission = {
