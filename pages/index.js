@@ -8,10 +8,10 @@ import Flag from '../components/flag';
 import Controls from '../components/controls';
 import {
   createMineSweeperState,
-  areAllMinesFlagged,
   isOpenCell,
   getFrontierCells,
-  difficultyMap
+  difficultyMap,
+  checkMineSweeperWin
 } from '../utils/minesweeper';
 
 const createGameState = options => {
@@ -20,6 +20,13 @@ const createGameState = options => {
     ...options
   };
 };
+
+const EndGameComponent = ({ text, resetHandler }) => (
+  <React.Fragment>
+    <h1>{text}</h1>
+    <button onClick={resetHandler}>Play Again?</button>
+  </React.Fragment>
+);
 
 class Index extends React.Component {
   constructor(props) {
@@ -68,8 +75,22 @@ class Index extends React.Component {
   }
 
   render() {
-    if (areAllMinesFlagged(this.state.gameBoard) || this.state.gameOver) {
-      return this.state.gameOver ? <p>Game Over.</p> : <p>You Won!!!!</p>;
+    if (checkMineSweeperWin(this.state.gameBoard) || this.state.gameOver) {
+      const resetHandler = () =>
+        this.setState(
+          createGameState({
+            boardSize: 5,
+            probability: difficultyMap.easy.probability,
+            authenticMode: false,
+            gameOver: false
+          })
+        );
+
+      return this.state.gameOver ? (
+        <EndGameComponent text="You Lost!" resetHandler={resetHandler} />
+      ) : (
+        <EndGameComponent text="You Won!" resetHandler={resetHandler} />
+      );
     }
     return (
       <Layout title={`Minesweeper (active)`}>

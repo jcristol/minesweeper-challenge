@@ -40,15 +40,21 @@ export function createMineSweeperState(boardSize, mineProbability = 0.1) {
 }
 
 /**
- * return true if all cells with mines have a flag
+ * return true if you have won the game
  * this is a win condition for minesweeper
  * @param {*} board the 2D array containing the data for a minesweeper board
  */
-export function areAllMinesFlagged(board) {
-  return board
+export function checkMineSweeperWin(board) {
+  const areAllMinesFlagged = board
     .flat()
     .filter(cell => cell.isMined)
     .every(cell => cell.isFlagged);
+
+  const areAllFlagsOnAMine = board
+    .flat()
+    .filter(cell => cell.isFlagged)
+    .every(cell => cell.isMined);
+  return areAllMinesFlagged && areAllFlagsOnAMine;
 }
 
 /**
