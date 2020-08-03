@@ -1,9 +1,9 @@
 import { createComponent } from 'cf-style-container';
 import {
-  generateMineSweeperBoard,
-  openCell,
-  collectNeighbors,
-  allMinesFlagged
+  createMineSweeperState,
+  isOpenCell,
+  getFrontierCells,
+  areAllMinesFlagged
 } from '../utils/minesweeper';
 import Square from './square';
 import Mine from './mine';
@@ -21,13 +21,13 @@ class Desk extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      gameBoard: generateMineSweeperBoard(props.boardSize)
+      gameBoard: createMineSweeperState(props.boardSize)
     };
   }
 
   componentDidUpdate() {
     const { gameBoard } = this.state;
-    if (allMinesFlagged(gameBoard) && !this.state.gameover) {
+    if (areAllMinesFlagged(gameBoard) && !this.state.gameover) {
       this.setState({ ...this.state, gameover: true, status: 'win' });
     }
   }
@@ -37,8 +37,8 @@ class Desk extends React.Component {
     // in original minesweeper mines searched in the open reveal more then one game tile
     // in this version of the game open tiles that are reveal
     // all neighbors and neighbors neighbors specified by a depth
-    if (withRecursion && openCell(cell, this.state.gameBoard)) {
-      const neighborHood = collectNeighbors(cell, this.state.gameBoard, 2);
+    if (withRecursion && isOpenCell(cell, this.state.gameBoard)) {
+      const neighborHood = getFrontierCells(cell, this.state.gameBoard, 2);
       neighborHood.forEach(n => this.reveal(event, n, false));
     }
 

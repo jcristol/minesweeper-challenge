@@ -1,4 +1,4 @@
-import { generateMineSweeperBoard } from '../utils/minesweeper';
+import { createMineSweeperState } from '../utils/minesweeper';
 import Layout from '../components/layout';
 
 // game components
