@@ -43,7 +43,9 @@ class Index extends React.Component {
   reveal(event, cell, withRecursion = true) {
     if (cell.isMined) {
       this.setState({ gameOver: true });
+      return;
     }
+
     if (
       this.state.authenticMode &&
       withRecursion &&
@@ -67,7 +69,7 @@ class Index extends React.Component {
 
   render() {
     if (areAllMinesFlagged(this.state.gameBoard) || this.state.gameOver) {
-      return <p>Game Over.</p>;
+      return this.state.gameOver ? <p>Game Over.</p> : <p>You Won!!!!</p>;
     }
     return (
       <Layout title={`Minesweeper (active)`}>
