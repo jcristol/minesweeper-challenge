@@ -20,8 +20,10 @@ const PrimitiveDesk = createComponent(({ boardSize }) => ({
 class Desk extends React.Component {
   constructor(props) {
     super(props);
+    const boardSize = 5;
     this.state = {
-      gameBoard: createMineSweeperState(props.boardSize)
+      gameBoard: createMineSweeperState(boardSize),
+      boardSize
     };
   }
 
@@ -60,6 +62,25 @@ class Desk extends React.Component {
     event.preventDefault();
   }
 
+  updateBoardSize(newBoardSize) {
+    this.setState({
+      gameBoard: createMineSweeperState(newBoardSize),
+      boardSize: newBoardSize
+    });
+  }
+
+  // toggleAuthenticMode() {
+  //   this.setState({
+  //     authMode: true
+  //   });
+  // }
+
+  selectDifficulty() {
+    this.setState({
+      gameBoard: createMineSweeperState(this.boardSize, 0.1)
+    });
+  }
+
   render() {
     if (this.state.gameover) {
       if (this.state.status === 'loss') {
@@ -69,20 +90,56 @@ class Desk extends React.Component {
       }
     }
     return (
-      <PrimitiveDesk boardSize={this.props.boardSize}>
-        {this.state.gameBoard.map(row =>
-          row.map(cell => (
-            <Square
-              key={cell.key}
-              onClick={event => this.reveal(event, cell)}
-              onContextMenu={event => this.flag(event, cell)}
-            >
-              {cell.isRevealed && (cell.isMined ? <Mine /> : cell.distance)}
-              {cell.isFlagged && <Flag />}
-            </Square>
-          ))
-        )}
-      </PrimitiveDesk>
+      <React.Fragment>
+        <PrimitiveDesk boardSize={this.state.boardSize}>
+          {this.state.gameBoard.map(row =>
+            row.map(cell => (
+              <Square
+                key={cell.key}
+                onClick={event => this.reveal(event, cell)}
+                onContextMenu={event => this.flag(event, cell)}
+              >
+                {cell.isRevealed && (cell.isMined ? <Mine /> : cell.distance)}
+                {cell.isFlagged && <Flag />}
+              </Square>
+            ))
+          )}
+        </PrimitiveDesk>
+        <div style={{ paddingTop: '4rem', display: 'flex', flexWrap: 'wrap' }}>
+          <div style={{ width: '20rem', padding: '2rem' }}>
+            <h2>Size of Board</h2>
+            <input
+              onChange={event => this.updateBoardSize(event.target.value)}
+            />
+          </div>
+          <div
+            style={{
+              width: '20rem',
+              padding: '2rem',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <h2 style={{ paddingRight: '1rem' }}>Authentic Mode</h2>
+            <input type="checkbox" onChange={() => this.toggleAuthenticMode} />
+          </div>
+          <div
+            style={{
+              width: '20rem',
+              padding: '2rem',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <h2 style={{ paddingRight: '1rem' }}>Difficulty</h2>
+            <select onChange={() => this.changeDifficulty}>
+              <option>easy</option>
+              <option>medium</option>
+              <option>hard</option>
+            </select>
+          </div>
+        </div>
+      </React.Fragment>
     );
   }
 }

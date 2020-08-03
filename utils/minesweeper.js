@@ -5,16 +5,20 @@
  * @param {*} mineProbability the probability from 0 - 1 of a cell having a mine in it
  */
 export function createMineSweeperState(boardSize, mineProbability = 0.2) {
-  const minedBoard = [...Array(boardSize).keys()].map(row => {
-    return [...Array(boardSize).keys()].map(col => ({
-      isRevealed: false,
-      isFlagged: false,
-      isMined: Math.random() < mineProbability,
-      row,
-      col,
-      key: `${row}, ${col}`
-    }));
-  });
+  const minedBoard = [];
+  for (let row = 0; row < boardSize; row++) {
+    minedBoard.push([]);
+    for (let col = 0; col < boardSize; col++) {
+      minedBoard[row].push({
+        isRevealed: false,
+        isFlagged: false,
+        isMined: Math.random() < mineProbability,
+        row,
+        col,
+        key: `${row}, ${col}`
+      });
+    }
+  }
   return minedBoard.map(row => {
     return row.map(cell =>
       cell.isMined
