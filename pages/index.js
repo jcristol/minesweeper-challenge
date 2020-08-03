@@ -3,7 +3,6 @@ import Layout from '../components/layout';
 
 // game components
 import Desk from '../components/desk';
-import Square from '../components/square';
 
 const Index = () => (
   <Layout title={`Minesweeper (active)`}>

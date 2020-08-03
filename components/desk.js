@@ -1,5 +1,9 @@
 import { createComponent } from 'cf-style-container';
-import { generateMineSweeperBoard } from '../utils/minesweeper';
+import {
+  generateMineSweeperBoard,
+  openCell,
+  collectNeighbors
+} from '../utils/minesweeper';
 import Square from './square';
 import Mine from './mine';
 import Flag from './flag';
@@ -18,37 +22,58 @@ class Desk extends React.Component {
     this.state = {
       gameBoard: generateMineSweeperBoard(props.boardSize)
     };
-    this.flag = this.flag.bind(this);
-    this.reveal = this.reveal.bind(this);
   }
 
-  reveal(event, { i }) {
-    this.state.gameBoard[i].isRevealed = true;
+  reveal(event, cell, withRecursion = true) {
+    // this if statement trys to mimic original minesweeper
+    // in original minesweeper mines searched in the open reveal more then one game tile
+    // in this version of the game open tiles that are reveal
+    // all neighbors and neighbors neighbors specified by a depth
+    if (withRecursion && openCell(cell, this.state.gameBoard)) {
+      const neighborHood = collectNeighbors(cell, this.state.gameBoard, 2);
+      neighborHood.forEach(n => this.reveal(event, n, false));
+    }
+
+    // update the gameboard state for this cell
+    cell.isRevealed = true;
     this.setState({ gameBoard: this.state.gameBoard });
-    event.preventDefault();
+
+    // if the cell is mined then trigger a game loss
+    if (cell.isMined) {
+      this.setState({ ...this.state, gameover: true, status: 'loss' });
+    }
   }
 
-  flag(event, { isRevealed, isFlagged, i }) {
-    if (!isRevealed) {
-      this.state.gameBoard[i].isFlagged = !isFlagged;
+  flag(event, cell) {
+    if (!cell.isRevealed) {
+      cell.isFlagged = !cell.isFlagged;
       this.setState({ gameBoard: this.state.gameBoard });
     }
     event.preventDefault();
   }
 
   render() {
+    if (this.state.gameover) {
+      if (this.state.status === 'loss') {
+        return <p>Game Over</p>;
+      } else {
+        return <p>Congrats you won</p>;
+      }
+    }
     return (
       <PrimitiveDesk boardSize={this.props.boardSize}>
-        {this.state.gameBoard.map(cell => (
-          <Square
-            key={cell.i}
-            onClick={event => this.reveal(event, cell)}
-            onContextMenu={event => this.flag(event, cell)}
-          >
-            {cell.isRevealed && (cell.isMined ? <Mine /> : cell.distance)}
-            {cell.isFlagged && <Flag />}
-          </Square>
-        ))}
+        {this.state.gameBoard.map(row =>
+          row.map(cell => (
+            <Square
+              key={cell.key}
+              onClick={event => this.reveal(event, cell)}
+              onContextMenu={event => this.flag(event, cell)}
+            >
+              {cell.isRevealed && (cell.isMined ? <Mine /> : cell.distance)}
+              {cell.isFlagged && <Flag />}
+            </Square>
+          ))
+        )}
       </PrimitiveDesk>
     );
   }

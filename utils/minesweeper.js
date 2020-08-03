@@ -1,28 +1,49 @@
 export function generateMineSweeperBoard(boardSize, mineProbability = 0.2) {
   const minedBoard = [...Array(boardSize).keys()].map(row => {
-    return [...Array(boardSize).keys()].map(col => {
-      const isMined = Math.random() < mineProbability;
-      return {
-        isRevealed: false,
-        isFlagged: false,
-        isMined,
-        row,
-        col
-      };
-    });
+    return [...Array(boardSize).keys()].map(col => ({
+      isRevealed: false,
+      isFlagged: false,
+      isMined: Math.random() < mineProbability,
+      row,
+      col,
+      key: `${row}, ${col}`
+    }));
   });
-  return minedBoard
-    .map(row =>
-      row.map(cell => {
-        if (!cell.isMined) {
-          return { ...cell, distance: calculateMineDistance(cell, minedBoard) };
-        } else {
-          return cell;
-        }
-      })
-    )
-    .flat()
-    .map((cell, i) => ({ ...cell, i }));
+  return minedBoard.map(row => {
+    return row.map(cell =>
+      cell.isMined
+        ? cell
+        : { ...cell, distance: calculateMineDistance(cell, minedBoard) }
+    );
+  });
+}
+
+export function collectNeighbors(cell, board, depth) {
+  let frontier = [cell];
+  const visitedSet = new Set();
+  const neighbors = [];
+
+  while (depth > 0) {
+    depth -= 1;
+    frontier.forEach(currentCell =>
+      visitedSet.add(uniqueCellHash(currentCell))
+    );
+
+    frontier = frontier
+      .map(currentCell =>
+        findUnvisitedNeighbors(currentCell, board, visitedSet)
+      )
+      .flat();
+    neighbors.push(frontier);
+  }
+  return neighbors.flat().filter(n => !n.isMined);
+}
+
+export function openCell(cell, board) {
+  const visitedSet = new Set();
+  visitedSet.add(uniqueCellHash(cell));
+  const neighbors = findUnvisitedNeighbors(cell, board, visitedSet);
+  return neighbors.every(c => !c.isRevealed);
 }
 
 function uniqueCellHash(cell) {
