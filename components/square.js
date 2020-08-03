@@ -1,5 +1,7 @@
 import React from 'react';
 import { createComponent } from 'cf-style-container';
+import Mine from './mine';
+import Flag from './flag';
 
 const PrimitiveSquare = createComponent(
   ({ disabled }) => ({
@@ -20,10 +22,35 @@ const PrimitiveSquare = createComponent(
 class Square extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isRevealed: false,
+      isFlagged: false
+    };
+  }
+
+  flagHandler(event) {
+    if (!this.state.isRevealed) {
+      this.setState(state => ({ ...state, isFlagged: !state.isFlagged }));
+    }
+    event.preventDefault();
+  }
+
+  revealHandler(event) {
+    this.setState(state => ({ ...state, isRevealed: true }));
+    event.preventDefault();
   }
 
   render() {
-    return <PrimitiveSquare>{this.props.children}</PrimitiveSquare>;
+    return (
+      <PrimitiveSquare
+        onClick={event => this.revealHandler(event)}
+        onContextMenu={event => this.flagHandler(event)}
+      >
+        {this.state.isRevealed &&
+          (this.props.isMined ? <Mine /> : this.props.distance)}
+        {this.state.isFlagged && <Flag />}
+      </PrimitiveSquare>
+    );
   }
 }
 

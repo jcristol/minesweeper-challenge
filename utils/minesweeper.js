@@ -3,8 +3,6 @@ export function generateMineSweeperBoard(boardSize, mineProbability = 0.2) {
     return [...Array(boardSize).keys()].map(col => {
       const isMined = Math.random() < mineProbability;
       return {
-        isRevealed: false,
-        isFlagged: false,
         isMined,
         row,
         col
