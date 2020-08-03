@@ -1,3 +1,18 @@
+export const difficultyMap = {
+  easy: {
+    text: 'easy',
+    probability: 0.1
+  },
+  medium: {
+    text: 'medium',
+    probability: 0.2
+  },
+  hard: {
+    text: 'hard',
+    probability: 0.3
+  }
+};
+
 /**
  * This function generates a 2D array of minesweeper cells
  * it is used by the Desk component as the state backing the minesweeper game

@@ -10,45 +10,42 @@ import {
   createMineSweeperState,
   areAllMinesFlagged,
   isOpenCell,
-  getFrontierCells
+  getFrontierCells,
+  difficultyMap
 } from '../utils/minesweeper';
+
+const createGameState = options => {
+  return {
+    gameBoard: createMineSweeperState(options.boardSize, options.probability),
+    ...options
+  };
+};
 
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    const boardSize = 5;
-    this.state = {
-      gameBoard: createMineSweeperState(boardSize),
-      gameSettings: {
-        boardSize,
-        authenticMode: false,
-        difficulty: 'easy'
-      }
-    };
-  }
-
-  updateGameSetting(settings) {
-    const difficultMap = {
-      easy: 0.1,
-      medium: 0.2,
-      hard: 0.3
-    };
-
-    this.setState({
-      gameSettings: {
-        boardSize: this.state.gameSettings.boardSize,
-        ...settings
-      },
-      gameBoard: createMineSweeperState(
-        settings.boardSize || this.state.gameSettings.boardSize,
-        difficultMap[settings.difficulty]
-      )
+    this.state = createGameState({
+      boardSize: 5,
+      probability: difficultyMap.easy.probability,
+      authenticMode: false
     });
   }
 
+  updateGameSetting(settings) {
+    this.setState(
+      createGameState({
+        ...settings,
+        boardSize: settings.boardSize || this.state.boardSize
+      })
+    );
+  }
+
   reveal(event, cell, withRecursion = true) {
+    if (cell.isMined) {
+      this.setState({ gameOver: true });
+    }
     if (
-      this.state.gameSettings.authenticMode &&
+      this.state.authenticMode &&
       withRecursion &&
       isOpenCell(cell, this.state.gameBoard)
     ) {
@@ -56,14 +53,8 @@ class Index extends React.Component {
       neighborHood.forEach(n => this.reveal(event, n, false));
     }
 
-    // update the gameboard state for this cell
     cell.isRevealed = true;
     this.setState({ gameBoard: this.state.gameBoard });
-
-    // if the cell is mined then trigger a game loss
-    if (cell.isMined) {
-      this.setState({ ...this.state, gameover: true, status: 'loss' });
-    }
   }
 
   flag(event, cell) {
@@ -75,13 +66,12 @@ class Index extends React.Component {
   }
 
   render() {
-    if (areAllMinesFlagged(this.state.gameBoard)) {
-      // render the winning information
+    if (areAllMinesFlagged(this.state.gameBoard) || this.state.gameOver) {
       return <p>Game Over.</p>;
     }
     return (
       <Layout title={`Minesweeper (active)`}>
-        <Desk boardSize={this.state.gameSettings.boardSize}>
+        <Desk boardSize={this.state.boardSize}>
           {this.state.gameBoard.map(row =>
             row.map(cell => (
               <Square
@@ -89,7 +79,8 @@ class Index extends React.Component {
                 onClick={event => this.reveal(event, cell)}
                 onContextMenu={event => this.flag(event, cell)}
               >
-                {cell.isRevealed && (cell.isMined ? <Mine /> : cell.distance)}
+                {(cell.isRevealed || this.state.revealAllMode) &&
+                  (cell.isMined ? <Mine /> : cell.distance)}
                 {cell.isFlagged && <Flag />}
               </Square>
             ))

@@ -1,4 +1,5 @@
 import { createComponent } from 'cf-style-container';
+import { difficultyMap } from '../utils/minesweeper';
 
 const StyledDiv = createComponent(() => ({}), 'div');
 const Select = createComponent(() => ({}), 'select', ['value', 'onChange']);
@@ -26,37 +27,36 @@ const validBoardSizeInput = inputSize => {
   return !isNaN(parseInt(inputSize));
 };
 
+const controlsInitialState = {
+  boardSize: '',
+  difficulty: difficultyMap.easy.text,
+  authenticMode: false,
+  revealAllMode: false
+};
+
 class Controls extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      boardSize: '',
-      difficulty: 'easy',
-      authenticMode: false
-    };
+    this.state = controlsInitialState;
   }
 
   formSubmit() {
-    // in case you leave the form blank
+    const gameBoardSettings = {
+      ...this.state,
+      probability: difficultyMap[this.state.difficulty].probability
+    };
+
     if (this.state.boardSize === '') {
-      const { difficulty, authenticMode } = this.state;
-      const formSubmission = {
-        difficulty,
-        authenticMode
-      };
-      const { submitForm } = this.props;
-      submitForm(formSubmission);
+      this.props.submitForm({
+        ...gameBoardSettings
+      });
     }
-    // validating numeric input for the board size
+
     if (validBoardSizeInput(this.state.boardSize)) {
-      const { difficulty, authenticMode, boardSize } = this.state;
-      const formSubmission = {
-        boardSize: parseInt(boardSize),
-        difficulty,
-        authenticMode
-      };
-      const { submitForm } = this.props;
-      submitForm(formSubmission);
+      this.props.submitForm({
+        ...gameBoardSettings,
+        boardSize: parseInt(this.state.boardSize)
+      });
     }
   }
 
@@ -78,9 +78,9 @@ class Controls extends React.Component {
               this.setState({ difficulty: event.target.value })
             }
           >
-            <option>easy</option>
-            <option>medium</option>
-            <option>hard</option>
+            {Object.keys(difficultyMap).map(option => {
+              return <option key={option}>{difficultyMap[option].text}</option>;
+            })}
           </Select>
         </ControlDiv>
         <ControlDiv>
@@ -90,6 +90,16 @@ class Controls extends React.Component {
             value={this.state.authenticMode}
             onChange={() =>
               this.setState({ authenticMode: !this.state.authenticMode })
+            }
+          />
+        </ControlDiv>
+        <ControlDiv>
+          <H3>Reveal All Mode</H3>
+          <CheckBox
+            type="checkbox"
+            value={this.state.revealAllMode}
+            onChange={() =>
+              this.setState({ revealAllMode: !this.state.revealAllMode })
             }
           />
         </ControlDiv>
