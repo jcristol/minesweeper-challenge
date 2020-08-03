@@ -23,8 +23,10 @@ const createGameState = options => {
 
 const EndGameComponent = ({ text, resetHandler }) => (
   <React.Fragment>
-    <h1>{text}</h1>
-    <button onClick={resetHandler}>Play Again?</button>
+    <h1 style={{ marginLeft: '2rem' }}>{text}</h1>
+    <button style={{ marginLeft: '2rem' }} onClick={resetHandler}>
+      Play Again?
+    </button>
   </React.Fragment>
 );
 
@@ -93,7 +95,7 @@ class Index extends React.Component {
       );
     }
     return (
-      <Layout title={`Minesweeper (active)`}>
+      <Layout title="Minesweeper">
         <Desk boardSize={this.state.boardSize}>
           {this.state.gameBoard.map(row =>
             row.map(cell => (
