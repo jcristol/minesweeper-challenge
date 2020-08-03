@@ -6,7 +6,7 @@ import Desk from '../components/desk';
 
 const Index = () => (
   <Layout title={`Minesweeper (active)`}>
-    <Desk boardSize={10} />
+    <Desk boardSize={3} />
   </Layout>
 );
 

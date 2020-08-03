@@ -2,7 +2,8 @@ import { createComponent } from 'cf-style-container';
 import {
   generateMineSweeperBoard,
   openCell,
-  collectNeighbors
+  collectNeighbors,
+  allMinesFlagged
 } from '../utils/minesweeper';
 import Square from './square';
 import Mine from './mine';
@@ -24,8 +25,15 @@ class Desk extends React.Component {
     };
   }
 
+  componentDidUpdate() {
+    const { gameBoard } = this.state;
+    if (allMinesFlagged(gameBoard) && !this.state.gameover) {
+      this.setState({ ...this.state, gameover: true, status: 'win' });
+    }
+  }
+
   reveal(event, cell, withRecursion = true) {
-    // this if statement trys to mimic original minesweeper
+    // this if statement tries to mimic original minesweeper
     // in original minesweeper mines searched in the open reveal more then one game tile
     // in this version of the game open tiles that are reveal
     // all neighbors and neighbors neighbors specified by a depth

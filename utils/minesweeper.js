@@ -18,6 +18,13 @@ export function generateMineSweeperBoard(boardSize, mineProbability = 0.2) {
   });
 }
 
+export function allMinesFlagged(board) {
+  return board
+    .flat()
+    .filter(cell => cell.isMined)
+    .every(cell => cell.isFlagged);
+}
+
 export function collectNeighbors(cell, board, depth) {
   let frontier = [cell];
   const visitedSet = new Set();
