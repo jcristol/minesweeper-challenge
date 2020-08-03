@@ -17,8 +17,19 @@ class Index extends React.Component {
     const boardSize = 5;
     this.state = {
       gameBoard: createMineSweeperState(boardSize),
-      boardSize
+      gameSettings: {
+        boardSize,
+        authenticMode: false,
+        difficulty: 'easy'
+      }
     };
+  }
+
+  updateGameSetting(settings) {
+    this.setState({
+      gameSettings: settings,
+      gameBoard: createMineSweeperState(settings.boardSize)
+    });
   }
 
   reveal(event, cell, withRecursion = true) {
@@ -56,7 +67,7 @@ class Index extends React.Component {
     }
     return (
       <Layout title={`Minesweeper (active)`}>
-        <Desk boardSize={this.state.boardSize}>
+        <Desk boardSize={this.state.gameSettings.boardSize}>
           {this.state.gameBoard.map(row =>
             row.map(cell => (
               <Square
@@ -70,7 +81,7 @@ class Index extends React.Component {
             ))
           )}
         </Desk>
-        <Controls />
+        <Controls submitForm={settings => this.updateGameSetting(settings)} />
       </Layout>
     );
   }

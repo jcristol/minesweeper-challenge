@@ -44,7 +44,8 @@ class Controls extends React.Component {
         difficulty,
         authenticMode
       };
-      console.log(`${JSON.stringify(formSubmission)}`);
+      const { submitForm } = this.props;
+      submitForm(formSubmission);
     }
   }
 
