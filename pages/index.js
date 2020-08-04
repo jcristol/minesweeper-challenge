@@ -49,7 +49,7 @@ class Index extends React.Component {
     );
   }
 
-  reveal(event, cell, withRecursion = true) {
+  reveal(cell, withRecursion = true) {
     if (cell.isMined) {
       this.setState({ gameOver: true });
       return;
@@ -61,7 +61,7 @@ class Index extends React.Component {
       isOpenCell(cell, this.state.gameBoard)
     ) {
       const neighborHood = getFrontierCells(cell, this.state.gameBoard, 2);
-      neighborHood.forEach(n => this.reveal(event, n, false));
+      neighborHood.forEach(neighbor => this.reveal(neighbor, false));
     }
 
     cell.isRevealed = true;
@@ -101,7 +101,7 @@ class Index extends React.Component {
             row.map(cell => (
               <Square
                 key={cell.key}
-                onClick={event => this.reveal(event, cell)}
+                onClick={() => this.reveal(cell)}
                 onContextMenu={event => this.flag(event, cell)}
               >
                 {(cell.isRevealed || this.state.revealAllMode) &&
