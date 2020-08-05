@@ -23,10 +23,10 @@ const createGameState = gameSettings => {
 };
 
 const EndGameComponent = ({ text, resetHandler }) => (
-  <React.Fragment>
-    <h1>{text}</h1>
+  <div style={{ marginBottom: '1rem' }}>
+    <h1 style={{ margin: 0 }}>{text}</h1>
     <button onClick={resetHandler}>Play Again?</button>
-  </React.Fragment>
+  </div>
 );
 
 const SquareContent = ({ isMined, cellNumber }) => {

@@ -10,7 +10,8 @@ const sharedStyles = {
 const StyledDiv = createComponent(
   () => ({
     display: 'flex',
-    flexDirection: 'column'
+    flexDirection: 'column',
+    marginBottom: '1rem'
   }),
   'div'
 );
@@ -40,7 +41,12 @@ const CheckBox = createComponent(
   ['type', 'value', 'onChange']
 );
 const Button = createComponent(() => ({}), 'button', ['onClick']);
-const ControlDiv = createComponent(() => ({}), 'div');
+const ControlDiv = createComponent(
+  () => ({
+    marginBottom: '0.5rem'
+  }),
+  'div'
+);
 
 const CheckBoxDiv = createComponent(
   () => ({
