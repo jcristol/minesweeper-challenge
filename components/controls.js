@@ -117,22 +117,6 @@ class Controls extends React.Component {
           </ControlDiv>
           <ControlDiv>
             <CheckBoxDiv>
-              <H3>Authentic Mode</H3>
-              <CheckBox
-                type="checkbox"
-                value={this.state.authenticMode}
-                onChange={() =>
-                  this.setState({ authenticMode: !this.state.authenticMode })
-                }
-              />
-            </CheckBoxDiv>
-            <P>
-              When Checked mimics actual minesweeper behavior where clicking on
-              a tile in the open reveals more then a single tile.
-            </P>
-          </ControlDiv>
-          <ControlDiv>
-            <CheckBoxDiv>
               <H3>Reveal All Mode</H3>
               <CheckBox
                 type="checkbox"

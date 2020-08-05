@@ -61,14 +61,42 @@ export function checkMineSweeperWin(board) {
 }
 
 /**
+ * reveals all tiles that aren't mined. is triggered when revealing a zero tile
+ * @param {*} cell - the cell to reveal all cells around
+ * @param {*} gameBoard - the gameBoard which will be used for computing neighbors
+ * @param {*} visitedSet - the set of tiles that have already been visited
+ * @param {*} reveal - a function that will continue the recursion
+ */
+export function revealAllNeighboringCells({
+  cell,
+  gameBoard,
+  visitedSet,
+  reveal
+}) {
+  visitedSet.add(hashCell(cell));
+  getUnvisitedNeighbors(cell, gameBoard, visitedSet)
+    .filter(neighbor => !neighbor.isMined)
+    .forEach(neighbor => {
+      visitedSet.add(hashCell(neighbor));
+      reveal(neighbor, visitedSet);
+    });
+}
+
+/**
  * reliable hashing function for a cell for use with Sets and Maps
  * @param {*} cell the cell to hash
  */
-export function hashCell(cell) {
+function hashCell(cell) {
   return `[${cell.row}, ${cell.col}]`;
 }
 
-export function getUnvisitedNeighbors(cell, board, visitedSet) {
+/**
+ * gets immediate neighbors that have not been visited according to a visited set
+ * @param {*} cell the cell to look for neighbors around
+ * @param {*} board the board to look in
+ * @param {*} visitedSet the set that tracks which neighbors have already been visited
+ */
+function getUnvisitedNeighbors(cell, board, visitedSet) {
   const neighbors = getNeighboringCells(cell, board);
   return neighbors.filter(neighbor => !visitedSet.has(hashCell(neighbor)));
 }
@@ -100,6 +128,11 @@ function getNeighboringCells(cell, board) {
     .map(([i, j]) => board[i][j]);
 }
 
+/**
+ * counts the number of adjacent mines for a cell
+ * @param {*} cell the cell check adjacent mines for
+ * @param {*} board the board where the cell lives
+ */
 function countAdjacentMines(cell, board) {
   return getNeighboringCells(cell, board).reduce(
     (acc, cell) => (cell.isMined ? acc + 1 : acc),

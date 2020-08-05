@@ -9,8 +9,7 @@ import Controls from '../components/controls';
 import {
   createMineSweeperState,
   difficultyMap,
-  getUnvisitedNeighbors,
-  hashCell
+  revealAllNeighboringCells
 } from '../utils/minesweeper';
 
 const createGameState = options => {
@@ -57,13 +56,12 @@ class Index extends React.Component {
 
   reveal(cell, visitedSet = new Set()) {
     if (cell.cellNumber === 0) {
-      visitedSet.add(hashCell(cell));
-      getUnvisitedNeighbors(cell, this.state.gameBoard, visitedSet)
-        .filter(neighbor => !neighbor.isMined)
-        .forEach(neighbor => {
-          visitedSet.add(hashCell(neighbor));
-          this.reveal(neighbor, visitedSet);
-        });
+      revealAllNeighboringCells({
+        cell,
+        gameBoard: this.state.gameBoard,
+        visitedSet,
+        reveal: (cell, visitedSet) => this.reveal(cell, visitedSet)
+      });
     }
 
     if (cell.isMined) {
