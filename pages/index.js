@@ -8,10 +8,9 @@ import Flag from '../components/flag';
 import Controls from '../components/controls';
 import {
   createMineSweeperState,
-  isOpenCell,
-  getFrontierCells,
   difficultyMap,
-  checkMineSweeperWin
+  getUnvisitedNeighbors,
+  hashCell
 } from '../utils/minesweeper';
 
 const createGameState = options => {
@@ -30,11 +29,18 @@ const EndGameComponent = ({ text, resetHandler }) => (
   </React.Fragment>
 );
 
+const SquareContent = ({ isMined, cellNumber }) => {
+  if (isMined) {
+    return <Mine />;
+  }
+  return cellNumber === 0 ? null : cellNumber;
+};
+
 class Index extends React.Component {
   constructor(props) {
     super(props);
     this.state = createGameState({
-      boardSize: 5,
+      boardSize: 10,
       probability: difficultyMap.easy.probability,
       authenticMode: false
     });
@@ -49,19 +55,19 @@ class Index extends React.Component {
     );
   }
 
-  reveal(cell, withRecursion = true) {
-    if (cell.isMined) {
-      this.setState({ gameOver: true });
-      return;
+  reveal(cell, visitedSet = new Set()) {
+    if (cell.cellNumber === 0) {
+      visitedSet.add(hashCell(cell));
+      getUnvisitedNeighbors(cell, this.state.gameBoard, visitedSet)
+        .filter(neighbor => !neighbor.isMined)
+        .forEach(neighbor => {
+          visitedSet.add(hashCell(neighbor));
+          this.reveal(neighbor, visitedSet);
+        });
     }
 
-    if (
-      this.state.authenticMode &&
-      withRecursion &&
-      isOpenCell(cell, this.state.gameBoard)
-    ) {
-      const neighborHood = getFrontierCells(cell, this.state.gameBoard, 2);
-      neighborHood.forEach(neighbor => this.reveal(neighbor, false));
+    if (cell.isMined) {
+      this.setState({ gameOver: true });
     }
 
     cell.isRevealed = true;
@@ -77,38 +83,44 @@ class Index extends React.Component {
   }
 
   render() {
-    if (checkMineSweeperWin(this.state.gameBoard) || this.state.gameOver) {
-      const resetHandler = () =>
-        this.setState(
-          createGameState({
-            boardSize: 5,
-            probability: difficultyMap.easy.probability,
-            authenticMode: false,
-            gameOver: false
-          })
-        );
+    // if (checkMineSweeperWin(this.state.gameBoard) || this.state.gameOver) {
+    //   const resetHandler = () =>
+    //     this.setState(
+    //       createGameState({
+    //         boardSize: 5,
+    //         probability: difficultyMap.easy.probability,
+    //         authenticMode: false,
+    //         gameOver: false
+    //       })
+    //     );
 
-      return this.state.gameOver ? (
-        <EndGameComponent text="You Lost!" resetHandler={resetHandler} />
-      ) : (
-        <EndGameComponent text="You Won!" resetHandler={resetHandler} />
-      );
-    }
+    //   return this.state.gameOver ? (
+    //     <EndGameComponent text="You Lost!" resetHandler={resetHandler} />
+    //   ) : (
+    //     <EndGameComponent text="You Won!" resetHandler={resetHandler} />
+    //   );
+    // }
     return (
       <Layout title="Minesweeper">
         <Desk boardSize={this.state.boardSize}>
           {this.state.gameBoard.map(row =>
-            row.map(cell => (
-              <Square
-                key={cell.key}
-                onClick={() => this.reveal(cell)}
-                onContextMenu={event => this.flag(event, cell)}
-              >
-                {(cell.isRevealed || this.state.revealAllMode) &&
-                  (cell.isMined ? <Mine /> : cell.distance)}
-                {cell.isFlagged && <Flag />}
-              </Square>
-            ))
+            row.map(cell => {
+              return (
+                <Square
+                  disabled={
+                    cell.isRevealed && (cell.isMined || cell.cellNumber === 0)
+                  }
+                  key={cell.key}
+                  onClick={() => this.reveal(cell)}
+                  onContextMenu={event => this.flag(event, cell)}
+                >
+                  {(cell.isRevealed || this.state.revealAllMode) && (
+                    <SquareContent {...cell} />
+                  )}
+                  {cell.isFlagged && <Flag />}
+                </Square>
+              );
+            })
           )}
         </Desk>
         <Controls submitForm={settings => this.updateGameSetting(settings)} />
