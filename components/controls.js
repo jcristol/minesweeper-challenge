@@ -61,7 +61,9 @@ const CheckBoxDiv = createComponent(
 );
 
 const Controls = ({
-  gameSettings: { boardSize, difficulty, revealAllMode },
+  boardSize,
+  difficulty,
+  revealAllMode,
   updateGameSettings
 }) => {
   return (

@@ -13,7 +13,6 @@ import {
   checkMineSweeperWin,
   generateCellColor
 } from '../utils/minesweeper';
-import { getInitialProps } from 'cf-style-nextjs';
 
 const createGameState = gameSettings => {
   const { boardSize, difficulty, gameOver } = gameSettings;
@@ -89,17 +88,17 @@ class Index extends React.Component {
     this.setState({ gameBoard: this.state.gameBoard });
   }
 
-  flag(event, cell) {
+  flag(cell) {
     if (!cell.isRevealed) {
       cell.isFlagged = !cell.isFlagged;
       this.setState({ gameBoard: this.state.gameBoard });
     }
-    event.preventDefault();
   }
 
   render() {
     const restartGameHandler = () =>
       this.updateGameSettings({ gameOver: false });
+    const gameSettings = this.state.gameSettings;
     return (
       <Layout title="Minesweeper">
         {checkMineSweeperWin(this.state.gameBoard) && (
@@ -115,22 +114,32 @@ class Index extends React.Component {
           />
         )}
         <Controls
-          gameSettings={this.state.gameSettings}
+          {...gameSettings}
           updateGameSettings={settings => this.updateGameSettings(settings)}
         />
-        <Desk boardSize={this.state.gameSettings.boardSize}>
+        <Desk boardSize={gameSettings.boardSize}>
           {this.state.gameBoard.map(row =>
             row.map(cell => (
               <Square
                 disabled={
-                  cell.isRevealed && (cell.isMined || cell.cellNumber === 0)
+                  (cell.isRevealed || gameSettings.revealAllMode) &&
+                  (cell.isMined || cell.cellNumber === 0)
                 }
                 color={generateCellColor(cell.cellNumber)}
                 key={cell.key}
-                onClick={() => this.reveal(cell)}
-                onContextMenu={event => this.flag(event, cell)}
+                onClick={() => {
+                  if (!this.state.gameSettings.revealAllMode) {
+                    this.reveal(cell);
+                  }
+                }}
+                onContextMenu={event => {
+                  if (!this.state.gameSettings.revealAllMode) {
+                    this.flag(cell);
+                  }
+                  event.preventDefault();
+                }}
               >
-                {(cell.isRevealed || this.state.gameSettings.revealAllMode) && (
+                {(cell.isRevealed || gameSettings.revealAllMode) && (
                   <SquareContent {...cell} />
                 )}
                 {cell.isFlagged && <Flag />}
