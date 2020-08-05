@@ -14,9 +14,9 @@ import {
 } from '../utils/minesweeper';
 
 const createGameState = gameSettings => {
-  const { boardSize, probability, gameOver } = gameSettings;
+  const { boardSize, difficulty, gameOver } = gameSettings;
   return {
-    gameBoard: createMineSweeperState(boardSize, probability),
+    gameBoard: createMineSweeperState(boardSize, difficultyMap[difficulty].probability),
     gameSettings,
     gameOver
   };
@@ -41,7 +41,7 @@ class Index extends React.Component {
     super(props);
     this.state = createGameState({
       boardSize: 10,
-      probability: difficultyMap.easy.probability,
+      difficulty: difficultyMap.easy.text,
       authenticMode: false
     });
   }
@@ -103,7 +103,7 @@ class Index extends React.Component {
           />
         )}
         <Controls
-          boardSize={this.state.gameSettings.boardSize}
+          initialGameSettings={...this.state.gameSettings}
           updateGameSettings={settings => this.updateGameSettings(settings)}
         />
         <Desk boardSize={this.state.gameSettings.boardSize}>

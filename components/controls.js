@@ -16,23 +16,27 @@ const StyledDiv = createComponent(
   'div'
 );
 const Select = createComponent(() => ({}), 'select', ['value', 'onChange']);
+
 const P = createComponent(
   () => ({
     ...sharedStyles
   }),
   'p'
 );
+
 const H3 = createComponent(
   () => ({
     ...sharedStyles
   }),
   'h3'
 );
+
 const Input = createComponent(() => ({}), 'input', [
   'value',
   'type',
   'onChange'
 ]);
+
 const CheckBox = createComponent(
   () => ({
     marginTop: '6px'
@@ -40,7 +44,7 @@ const CheckBox = createComponent(
   'input',
   ['type', 'value', 'onChange']
 );
-const Button = createComponent(() => ({}), 'button', ['onClick']);
+
 const ControlDiv = createComponent(
   () => ({
     marginBottom: '0.5rem'
@@ -56,23 +60,14 @@ const CheckBoxDiv = createComponent(
   'div'
 );
 
-const validBoardSizeInput = inputSize => {
-  return !isNaN(parseInt(inputSize));
-};
-
-const controlsInitialState = {
-  difficulty: difficultyMap.easy.text,
-  authenticMode: false,
-  revealAllMode: false
-};
-
 class Controls extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { ...controlsInitialState, boardSize: props.boardSize };
+    this.state = this.props.initialGameSettings;
   }
 
   render() {
+    const { updateGameSettings } = this.props;
     return (
       <React.Fragment>
         <StyledDiv>
@@ -83,9 +78,7 @@ class Controls extends React.Component {
               type="number"
               onChange={event => {
                 this.setState({ boardSize: event.target.value });
-                this.props.updateGameSettings({
-                  boardSize: parseInt(event.target.value)
-                });
+                updateGameSettings({ boardSize: parseInt(event.target.value) });
               }}
             />
           </ControlDiv>
@@ -95,9 +88,7 @@ class Controls extends React.Component {
               value={this.state.difficulty}
               onChange={event => {
                 this.setState({ difficulty: event.target.value });
-                this.props.updateGameSettings({
-                  probability: difficultyMap[event.target.value].probability
-                });
+                updateGameSettings({ difficulty: event.target.value });
               }}
             >
               {Object.keys(difficultyMap).map(option => {
@@ -114,10 +105,9 @@ class Controls extends React.Component {
                 type="checkbox"
                 value={this.state.revealAllMode}
                 onChange={() => {
-                  this.setState({ revealAllMode: !this.state.revealAllMode });
-                  this.props.updateGameSettings({
-                    revealAllMode: !this.state.revealAllMode
-                  });
+                  const modeToggled = !this.state.revealAllMode;
+                  this.setState({ revealAllMode: modeToggled });
+                  updateGameSettings({ revealAllMode: modeToggled });
                 }}
               />
             </CheckBoxDiv>
