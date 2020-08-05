@@ -60,12 +60,7 @@ const CheckBoxDiv = createComponent(
   'div'
 );
 
-const Controls = ({
-  boardSize,
-  difficulty,
-  revealAllMode,
-  updateGameSettings
-}) => {
+const Controls = ({ boardSize, difficulty, revealAll, updateGameSettings }) => {
   return (
     <StyledDiv>
       <ControlDiv>
@@ -93,13 +88,11 @@ const Controls = ({
       </ControlDiv>
       <ControlDiv>
         <CheckBoxDiv>
-          <H3>Reveal All Mode</H3>
+          <H3>Reveal All</H3>
           <CheckBox
             type="checkbox"
-            value={revealAllMode}
-            onChange={() =>
-              updateGameSettings({ revealAllMode: !revealAllMode })
-            }
+            value={revealAll}
+            onChange={() => updateGameSettings({ revealAll: !revealAll })}
           />
         </CheckBoxDiv>
         <P>Reveals the entire minesweeper board.</P>

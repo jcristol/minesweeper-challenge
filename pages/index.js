@@ -46,8 +46,7 @@ class Index extends React.Component {
     return {
       initialGameState: createGameState({
         boardSize: 10,
-        difficulty: difficultyMap.easy.text,
-        authenticMode: false
+        difficulty: difficultyMap.easy.text
       })
     };
   };
@@ -58,12 +57,22 @@ class Index extends React.Component {
   }
 
   updateGameSettings(settings) {
-    this.setState(
-      createGameState({
-        ...this.state.gameSettings,
-        ...settings
-      })
-    );
+    if (settings.revealAll !== undefined) {
+      this.setState({
+        ...this.state,
+        gameSettings: {
+          ...this.state.gameSettings,
+          ...settings
+        }
+      });
+    } else {
+      this.setState(
+        createGameState({
+          ...this.state.gameSettings,
+          ...settings
+        })
+      );
+    }
   }
 
   reveal(cell, visitedSet = new Set()) {
@@ -122,24 +131,24 @@ class Index extends React.Component {
             row.map(cell => (
               <Square
                 disabled={
-                  (cell.isRevealed || gameSettings.revealAllMode) &&
+                  (cell.isRevealed || gameSettings.revealAll) &&
                   (cell.isMined || cell.cellNumber === 0)
                 }
                 color={generateCellColor(cell.cellNumber)}
                 key={cell.key}
                 onClick={() => {
-                  if (!this.state.gameSettings.revealAllMode) {
+                  if (!this.state.gameSettings.revealAll) {
                     this.reveal(cell);
                   }
                 }}
                 onContextMenu={event => {
-                  if (!this.state.gameSettings.revealAllMode) {
+                  if (!this.state.gameSettings.revealAll) {
                     this.flag(cell);
                   }
                   event.preventDefault();
                 }}
               >
-                {(cell.isRevealed || gameSettings.revealAllMode) && (
+                {(cell.isRevealed || gameSettings.revealAll) && (
                   <SquareContent {...cell} />
                 )}
                 {cell.isFlagged && <Flag />}
