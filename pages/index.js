@@ -10,7 +10,6 @@ import {
   createMineSweeperState,
   difficultyMap,
   revealAllNeighboringCells,
-  checkMineSweeperWin,
   generateCellColor
 } from '../utils/minesweeper';
 
@@ -25,13 +24,6 @@ const createGameState = gameSettings => {
     gameOver
   };
 };
-
-const EndGameComponent = ({ text, resetHandler }) => (
-  <div style={{ marginBottom: '1rem' }}>
-    <h1 style={{ margin: 0 }}>{text}</h1>
-    <button onClick={resetHandler}>Play Again?</button>
-  </div>
-);
 
 const SquareContent = ({ isMined, cellNumber }) => {
   if (isMined) {
@@ -106,33 +98,26 @@ class Index extends React.Component {
   }
 
   render() {
-    const restartGameHandler = () =>
-      this.updateGameSettings({ gameOver: false });
-    const gameSettings = this.state.gameSettings;
+    const { boardSize, revealAll } = this.state.gameSettings;
+    const { gameBoard, gameOver } = this.state;
+
     return (
-      <Layout title="Minesweeper">
-        {checkMineSweeperWin(this.state.gameBoard) && (
-          <EndGameComponent
-            text="You Won!!"
-            resetHandler={restartGameHandler}
-          />
-        )}
-        {this.state.gameOver && (
-          <EndGameComponent
-            text="You Lost!!"
-            resetHandler={restartGameHandler}
-          />
-        )}
+      <Layout
+        title="Minesweeper"
+        gameBoard={gameBoard}
+        gameOver={gameOver}
+        restartGameHandler={() => this.updateGameSettings({ gameOver: false })}
+      >
         <Controls
-          {...gameSettings}
+          {...this.state.gameSettings}
           updateGameSettings={settings => this.updateGameSettings(settings)}
         />
-        <Desk boardSize={gameSettings.boardSize}>
-          {this.state.gameBoard.map(row =>
+        <Desk boardSize={boardSize}>
+          {gameBoard.map(row =>
             row.map(cell => (
               <Square
                 disabled={
-                  (cell.isRevealed || gameSettings.revealAll) &&
+                  (cell.isRevealed || revealAll) &&
                   (cell.isMined || cell.cellNumber === 0)
                 }
                 color={generateCellColor(cell.cellNumber)}
@@ -150,10 +135,8 @@ class Index extends React.Component {
                   event.preventDefault();
                 }}
               >
-                {(cell.isRevealed || gameSettings.revealAll) && (
-                  <SquareContent {...cell} />
-                )}
-                {!gameSettings.revealAll && cell.isFlagged && <Flag />}
+                {(cell.isRevealed || revealAll) && <SquareContent {...cell} />}
+                {!revealAll && cell.isFlagged && <Flag />}
               </Square>
             ))
           )}
