@@ -40,8 +40,11 @@ const SquareContent = ({ isMined, cellNumber }) => {
   return cellNumber === 0 ? null : cellNumber;
 };
 
+const canFlagOrRevealTile = (state, cell) =>
+  state.gameSettings.revealAll || cell.isRevealed ? false : true;
+
 class Index extends React.Component {
-  // i spent way to much time trying to sync server and client state here
+  // this ensures that the client and server side render generate the same minesweeper board
   static getInitialProps = () => {
     return {
       initialGameState: createGameState({
@@ -98,10 +101,8 @@ class Index extends React.Component {
   }
 
   flag(cell) {
-    if (!cell.isRevealed) {
-      cell.isFlagged = !cell.isFlagged;
-      this.setState({ gameBoard: this.state.gameBoard });
-    }
+    cell.isFlagged = !cell.isFlagged;
+    this.setState({ gameBoard: this.state.gameBoard });
   }
 
   render() {
@@ -137,21 +138,22 @@ class Index extends React.Component {
                 color={generateCellColor(cell.cellNumber)}
                 key={cell.key}
                 onClick={() => {
-                  if (!this.state.gameSettings.revealAll) {
+                  if (canFlagOrRevealTile(this.state, cell)) {
                     this.reveal(cell);
                   }
                 }}
                 onContextMenu={event => {
-                  if (!this.state.gameSettings.revealAll) {
+                  if (canFlagOrRevealTile(this.state, cell)) {
                     this.flag(cell);
                   }
+                  // prevent the context menu from popping up
                   event.preventDefault();
                 }}
               >
                 {(cell.isRevealed || gameSettings.revealAll) && (
                   <SquareContent {...cell} />
                 )}
-                {cell.isFlagged && <Flag />}
+                {!gameSettings.revealAll && cell.isFlagged && <Flag />}
               </Square>
             ))
           )}
