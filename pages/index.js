@@ -16,7 +16,10 @@ import {
 const createGameState = gameSettings => {
   const { boardSize, difficulty, gameOver } = gameSettings;
   return {
-    gameBoard: createMineSweeperState(boardSize, difficultyMap[difficulty].probability),
+    gameBoard: createMineSweeperState(
+      boardSize,
+      difficultyMap[difficulty].probability
+    ),
     gameSettings,
     gameOver
   };
@@ -103,7 +106,7 @@ class Index extends React.Component {
           />
         )}
         <Controls
-          initialGameSettings={...this.state.gameSettings}
+          gameSettings={this.state.gameSettings}
           updateGameSettings={settings => this.updateGameSettings(settings)}
         />
         <Desk boardSize={this.state.gameSettings.boardSize}>
