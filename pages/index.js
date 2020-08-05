@@ -25,7 +25,7 @@ const createGameState = gameSettings => {
   };
 };
 
-const SquareContent = ({ isMined, cellNumber }) => {
+const CellContent = ({ isMined, cellNumber }) => {
   if (isMined) {
     return <Mine />;
   }
@@ -100,7 +100,11 @@ class Index extends React.Component {
   render() {
     const { boardSize, revealAll } = this.state.gameSettings;
     const { gameBoard, gameOver } = this.state;
-
+    const isCellDisabled = cell =>
+      (cell.isRevealed || revealAll) && (cell.isMined || cell.cellNumber === 0);
+    const showCellContent = cell =>
+      (cell.isRevealed || revealAll) && <CellContent {...cell} />;
+    const showFlag = cell => !revealAll && cell.isFlagged && <Flag />;
     return (
       <Layout
         title="Minesweeper"
@@ -116,10 +120,7 @@ class Index extends React.Component {
           {gameBoard.map(row =>
             row.map(cell => (
               <Square
-                disabled={
-                  (cell.isRevealed || revealAll) &&
-                  (cell.isMined || cell.cellNumber === 0)
-                }
+                disabled={isCellDisabled(cell)}
                 color={generateCellColor(cell.cellNumber)}
                 key={cell.key}
                 onClick={() => {
@@ -135,8 +136,8 @@ class Index extends React.Component {
                   event.preventDefault();
                 }}
               >
-                {(cell.isRevealed || revealAll) && <SquareContent {...cell} />}
-                {!revealAll && cell.isFlagged && <Flag />}
+                {showCellContent(cell)}
+                {showFlag(cell)}
               </Square>
             ))
           )}
