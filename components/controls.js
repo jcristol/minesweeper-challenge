@@ -77,7 +77,7 @@ class Controls extends React.Component {
               type="number"
               onChange={event => {
                 this.setState({ boardSize: event.target.value });
-                this.props.submitForm({
+                this.props.updateGameSettings({
                   boardSize: parseInt(event.target.value)
                 });
               }}
@@ -89,7 +89,7 @@ class Controls extends React.Component {
               value={this.state.difficulty}
               onChange={event => {
                 this.setState({ difficulty: event.target.value });
-                this.props.submitForm({
+                this.props.updateGameSettings({
                   probability: difficultyMap[this.state.difficulty].probability
                 });
               }}
@@ -109,7 +109,7 @@ class Controls extends React.Component {
                 value={this.state.revealAllMode}
                 onChange={() => {
                   this.setState({ revealAllMode: !this.state.revealAllMode });
-                  this.props.submitForm({
+                  this.props.updateGameSettings({
                     revealAllMode: !this.state.revealAllMode
                   });
                 }}

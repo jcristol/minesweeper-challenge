@@ -12,10 +12,11 @@ import {
   revealAllNeighboringCells
 } from '../utils/minesweeper';
 
-const createGameState = options => {
+const createGameState = gameSettings => {
+  const { boardSize, probability } = gameSettings;
   return {
-    gameBoard: createMineSweeperState(options.boardSize, options.probability),
-    ...options
+    gameBoard: createMineSweeperState(boardSize, probability),
+    gameSettings
   };
 };
 
@@ -45,11 +46,11 @@ class Index extends React.Component {
     });
   }
 
-  updateGameSetting(settings) {
+  updateGameSettings(settings) {
     this.setState(
       createGameState({
-        ...settings,
-        boardSize: settings.boardSize || this.state.boardSize
+        ...this.state.gameSettings,
+        ...settings
       })
     );
   }
@@ -84,10 +85,10 @@ class Index extends React.Component {
     return (
       <Layout title="Minesweeper">
         <Controls
-          boardSize={this.state.boardSize}
-          submitForm={settings => this.updateGameSetting(settings)}
+          boardSize={this.state.gameSettings.boardSize}
+          updateGameSettings={settings => this.updateGameSettings(settings)}
         />
-        <Desk boardSize={this.state.boardSize}>
+        <Desk boardSize={this.state.gameSettings.boardSize}>
           {this.state.gameBoard.map(row =>
             row.map(cell => (
               <Square
@@ -98,7 +99,7 @@ class Index extends React.Component {
                 onClick={() => this.reveal(cell)}
                 onContextMenu={event => this.flag(event, cell)}
               >
-                {(cell.isRevealed || this.state.revealAllMode) && (
+                {(cell.isRevealed || this.state.gameSettings.revealAllMode) && (
                   <SquareContent {...cell} />
                 )}
                 {cell.isFlagged && <Flag />}
