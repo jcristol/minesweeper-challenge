@@ -30,7 +30,7 @@ export function createMineSweeperState(boardSize, mineProbability) {
       key: `${row}, ${col}`
     }));
   });
-  return minedBoard.map(row => {
+  const board = minedBoard.map(row => {
     return row.map(cell =>
       cell.isMined
         ? cell
@@ -40,6 +40,10 @@ export function createMineSweeperState(boardSize, mineProbability) {
           }
     );
   });
+  if (board.flat().every(tile => !tile.isMined)) {
+    return createMineSweeperState(boardSize, mineProbability);
+  }
+  return board;
 }
 
 /**
@@ -48,16 +52,17 @@ export function createMineSweeperState(boardSize, mineProbability) {
  * @param {*} board the 2D array containing the data for a minesweeper board
  */
 export function checkMineSweeperWin(board) {
-  const areAllMinesFlagged = board
-    .flat()
+  const flatBoard = board.flat();
+  const areAllMinesFlagged = flatBoard
     .filter(cell => cell.isMined)
     .every(cell => cell.isFlagged);
-
-  const areAllFlagsOnAMine = board
-    .flat()
+  const areAllFlagsOnAMine = flatBoard
     .filter(cell => cell.isFlagged)
     .every(cell => cell.isMined);
-  return areAllMinesFlagged && areAllFlagsOnAMine;
+  const areAllNumericTilesRevealed = flatBoard
+    .filter(cell => cell.cellNumber)
+    .every(cell => cell.isRevealed);
+  return areAllMinesFlagged && areAllFlagsOnAMine && areAllNumericTilesRevealed;
 }
 
 /**

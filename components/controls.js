@@ -90,7 +90,7 @@ class Controls extends React.Component {
               onChange={event => {
                 this.setState({ difficulty: event.target.value });
                 this.props.updateGameSettings({
-                  probability: difficultyMap[this.state.difficulty].probability
+                  probability: difficultyMap[event.target.value].probability
                 });
               }}
             >

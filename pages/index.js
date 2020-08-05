@@ -9,23 +9,23 @@ import Controls from '../components/controls';
 import {
   createMineSweeperState,
   difficultyMap,
-  revealAllNeighboringCells
+  revealAllNeighboringCells,
+  checkMineSweeperWin
 } from '../utils/minesweeper';
 
 const createGameState = gameSettings => {
-  const { boardSize, probability } = gameSettings;
+  const { boardSize, probability, gameOver } = gameSettings;
   return {
     gameBoard: createMineSweeperState(boardSize, probability),
-    gameSettings
+    gameSettings,
+    gameOver
   };
 };
 
 const EndGameComponent = ({ text, resetHandler }) => (
   <React.Fragment>
-    <h1 style={{ marginLeft: '2rem' }}>{text}</h1>
-    <button style={{ marginLeft: '2rem' }} onClick={resetHandler}>
-      Play Again?
-    </button>
+    <h1>{text}</h1>
+    <button onClick={resetHandler}>Play Again?</button>
   </React.Fragment>
 );
 
@@ -65,6 +65,10 @@ class Index extends React.Component {
       });
     }
 
+    if (cell.isFlagged) {
+      cell.isFlagged = false;
+    }
+
     if (cell.isMined) {
       this.setState({ gameOver: true });
     }
@@ -82,8 +86,22 @@ class Index extends React.Component {
   }
 
   render() {
+    const restartGameHandler = () =>
+      this.updateGameSettings({ gameOver: false });
     return (
       <Layout title="Minesweeper">
+        {checkMineSweeperWin(this.state.gameBoard) && (
+          <EndGameComponent
+            text="You Won!!"
+            resetHandler={restartGameHandler}
+          />
+        )}
+        {this.state.gameOver && (
+          <EndGameComponent
+            text="You Lost!!"
+            resetHandler={restartGameHandler}
+          />
+        )}
         <Controls
           boardSize={this.state.gameSettings.boardSize}
           updateGameSettings={settings => this.updateGameSettings(settings)}
