@@ -9,19 +9,15 @@ const sharedStyles = {
 
 const StyledDiv = createComponent(
   () => ({
-    display: 'grid',
-    gridTemplateRows: 'auto auto auto',
-    gridTemplateColumns: '20rem auto',
-    gridRowGap: '2rem',
-    gridColumnGap: '1rem'
+    display: 'flex',
+    flexDirection: 'column'
   }),
   'div'
 );
 const Select = createComponent(() => ({}), 'select', ['value', 'onChange']);
 const P = createComponent(
   () => ({
-    ...sharedStyles,
-    paddingTop: '0.5rem'
+    ...sharedStyles
   }),
   'p'
 );
@@ -31,7 +27,11 @@ const H3 = createComponent(
   }),
   'h3'
 );
-const Input = createComponent(() => ({}), 'input', ['value', 'onChange']);
+const Input = createComponent(() => ({}), 'input', [
+  'value',
+  'type',
+  'onChange'
+]);
 const CheckBox = createComponent(
   () => ({
     marginTop: '6px'
@@ -55,7 +55,6 @@ const validBoardSizeInput = inputSize => {
 };
 
 const controlsInitialState = {
-  boardSize: '',
   difficulty: difficultyMap.easy.text,
   authenticMode: false,
   revealAllMode: false
@@ -64,27 +63,7 @@ const controlsInitialState = {
 class Controls extends React.Component {
   constructor(props) {
     super(props);
-    this.state = controlsInitialState;
-  }
-
-  formSubmit() {
-    const gameBoardSettings = {
-      ...this.state,
-      probability: difficultyMap[this.state.difficulty].probability
-    };
-
-    if (this.state.boardSize === '') {
-      this.props.submitForm({
-        ...gameBoardSettings
-      });
-    }
-
-    if (validBoardSizeInput(this.state.boardSize)) {
-      this.props.submitForm({
-        ...gameBoardSettings,
-        boardSize: parseInt(this.state.boardSize)
-      });
-    }
+    this.state = { ...controlsInitialState, boardSize: props.boardSize };
   }
 
   render() {
@@ -95,18 +74,25 @@ class Controls extends React.Component {
             <H3>Board Size</H3>
             <Input
               value={this.state.boardSize}
-              onChange={event =>
-                this.setState({ boardSize: event.target.value })
-              }
+              type="number"
+              onChange={event => {
+                this.setState({ boardSize: event.target.value });
+                this.props.submitForm({
+                  boardSize: parseInt(event.target.value)
+                });
+              }}
             />
           </ControlDiv>
           <ControlDiv>
             <H3>Difficulty</H3>
             <Select
               value={this.state.difficulty}
-              onChange={event =>
-                this.setState({ difficulty: event.target.value })
-              }
+              onChange={event => {
+                this.setState({ difficulty: event.target.value });
+                this.props.submitForm({
+                  probability: difficultyMap[this.state.difficulty].probability
+                });
+              }}
             >
               {Object.keys(difficultyMap).map(option => {
                 return (
@@ -121,15 +107,17 @@ class Controls extends React.Component {
               <CheckBox
                 type="checkbox"
                 value={this.state.revealAllMode}
-                onChange={() =>
-                  this.setState({ revealAllMode: !this.state.revealAllMode })
-                }
+                onChange={() => {
+                  this.setState({ revealAllMode: !this.state.revealAllMode });
+                  this.props.submitForm({
+                    revealAllMode: !this.state.revealAllMode
+                  });
+                }}
               />
             </CheckBoxDiv>
             <P>Reveals the entire minesweeper board.</P>
           </ControlDiv>
         </StyledDiv>
-        <Button onClick={() => this.formSubmit()}>Update Game Settings</Button>
       </React.Fragment>
     );
   }

@@ -19,7 +19,7 @@ export const difficultyMap = {
  * @param {*} boardSize the length and width of the minesweeper board
  * @param {*} mineProbability the probability from 0 - 1 of a cell having a mine in it
  */
-export function createMineSweeperState(boardSize, mineProbability = 0.1) {
+export function createMineSweeperState(boardSize, mineProbability) {
   const minedBoard = [...Array(boardSize).keys()].map(row => {
     return [...Array(boardSize).keys()].map(col => ({
       isRevealed: false,

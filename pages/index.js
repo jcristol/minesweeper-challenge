@@ -81,47 +81,31 @@ class Index extends React.Component {
   }
 
   render() {
-    // if (checkMineSweeperWin(this.state.gameBoard) || this.state.gameOver) {
-    //   const resetHandler = () =>
-    //     this.setState(
-    //       createGameState({
-    //         boardSize: 5,
-    //         probability: difficultyMap.easy.probability,
-    //         authenticMode: false,
-    //         gameOver: false
-    //       })
-    //     );
-
-    //   return this.state.gameOver ? (
-    //     <EndGameComponent text="You Lost!" resetHandler={resetHandler} />
-    //   ) : (
-    //     <EndGameComponent text="You Won!" resetHandler={resetHandler} />
-    //   );
-    // }
     return (
       <Layout title="Minesweeper">
+        <Controls
+          boardSize={this.state.boardSize}
+          submitForm={settings => this.updateGameSetting(settings)}
+        />
         <Desk boardSize={this.state.boardSize}>
           {this.state.gameBoard.map(row =>
-            row.map(cell => {
-              return (
-                <Square
-                  disabled={
-                    cell.isRevealed && (cell.isMined || cell.cellNumber === 0)
-                  }
-                  key={cell.key}
-                  onClick={() => this.reveal(cell)}
-                  onContextMenu={event => this.flag(event, cell)}
-                >
-                  {(cell.isRevealed || this.state.revealAllMode) && (
-                    <SquareContent {...cell} />
-                  )}
-                  {cell.isFlagged && <Flag />}
-                </Square>
-              );
-            })
+            row.map(cell => (
+              <Square
+                disabled={
+                  cell.isRevealed && (cell.isMined || cell.cellNumber === 0)
+                }
+                key={cell.key}
+                onClick={() => this.reveal(cell)}
+                onContextMenu={event => this.flag(event, cell)}
+              >
+                {(cell.isRevealed || this.state.revealAllMode) && (
+                  <SquareContent {...cell} />
+                )}
+                {cell.isFlagged && <Flag />}
+              </Square>
+            ))
           )}
         </Desk>
-        <Controls submitForm={settings => this.updateGameSetting(settings)} />
       </Layout>
     );
   }
