@@ -13,6 +13,21 @@ export const difficultyMap = {
   }
 };
 
+export const generateCellColor = number => {
+  const colors = {
+    0: undefined,
+    1: 'blue',
+    2: 'green',
+    3: 'red',
+    4: 'purple',
+    5: 'pink',
+    6: '#556B2F',
+    7: '#D2691E',
+    8: '#7FFFD4'
+  };
+  return number ? colors[number] : undefined;
+};
+
 /**
  * This function generates a 2D array of minesweeper cells
  * it is used by the Desk component as the state backing the minesweeper game
@@ -30,16 +45,16 @@ export function createMineSweeperState(boardSize, mineProbability) {
       key: `${row}, ${col}`
     }));
   });
-  const board = minedBoard.map(row => {
-    return row.map(cell =>
+  const board = minedBoard.map(row =>
+    row.map(cell =>
       cell.isMined
         ? cell
         : {
             ...cell,
             cellNumber: countAdjacentMines(cell, minedBoard)
           }
-    );
-  });
+    )
+  );
   if (board.flat().every(tile => !tile.isMined)) {
     return createMineSweeperState(boardSize, mineProbability);
   }

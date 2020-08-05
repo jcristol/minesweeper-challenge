@@ -2,7 +2,7 @@ import React from 'react';
 import { createComponent } from 'cf-style-container';
 
 const Square = createComponent(
-  ({ disabled }) => ({
+  ({ disabled, color }) => ({
     width: 40,
     height: 40,
     padding: 10,
@@ -11,7 +11,8 @@ const Square = createComponent(
     border: `1px solid black`,
     lineHeight: 1,
     textAlign: 'center',
-    fontSize: 18
+    fontSize: 18,
+    color
   }),
   'div',
   ['onClick', 'onContextMenu']

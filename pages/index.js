@@ -10,8 +10,10 @@ import {
   createMineSweeperState,
   difficultyMap,
   revealAllNeighboringCells,
-  checkMineSweeperWin
+  checkMineSweeperWin,
+  generateCellColor
 } from '../utils/minesweeper';
+import { getInitialProps } from 'cf-style-nextjs';
 
 const createGameState = gameSettings => {
   const { boardSize, difficulty, gameOver } = gameSettings;
@@ -40,13 +42,20 @@ const SquareContent = ({ isMined, cellNumber }) => {
 };
 
 class Index extends React.Component {
+  // i spent way to much time trying to sync server and client state here
+  static getInitialProps = () => {
+    return {
+      initialGameState: createGameState({
+        boardSize: 10,
+        difficulty: difficultyMap.easy.text,
+        authenticMode: false
+      })
+    };
+  };
+
   constructor(props) {
     super(props);
-    this.state = createGameState({
-      boardSize: 10,
-      difficulty: difficultyMap.easy.text,
-      authenticMode: false
-    });
+    this.state = props.initialGameState;
   }
 
   updateGameSettings(settings) {
@@ -116,6 +125,7 @@ class Index extends React.Component {
                 disabled={
                   cell.isRevealed && (cell.isMined || cell.cellNumber === 0)
                 }
+                color={generateCellColor(cell.cellNumber)}
                 key={cell.key}
                 onClick={() => this.reveal(cell)}
                 onContextMenu={event => this.flag(event, cell)}
